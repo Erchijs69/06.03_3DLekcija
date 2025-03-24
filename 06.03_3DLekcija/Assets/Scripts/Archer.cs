@@ -2,16 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Berserker : Character
+public class Archer : Character
 {
     public override int Attack()
     {
-        return 20; 
+        return 12; // Bultu uzbrukums
     }
 
     public override void Die()
     {
         base.Die();
+        // Izveidot jaunu pretinieku
         GameManager.Instance.CreateNewEnemy();
     }
 }

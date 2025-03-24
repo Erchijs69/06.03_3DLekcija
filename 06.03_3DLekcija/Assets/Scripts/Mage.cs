@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Berserker : Character
+public class Mage : Character
 {
     public override int Attack()
     {
-        return 20; 
+        return 15; 
     }
 
     public override void Die()

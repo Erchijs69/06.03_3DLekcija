@@ -4,11 +4,13 @@ using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
 {
-    [SerializeField] private int minDamage, maxDamage;
+    public int minDamage;
+    public int maxDamage;
 
     public int GetDamage()
     {
-        return Random.Range(minDamage, maxDamage + 1);
+        return Random.Range(minDamage, maxDamage); // Piemērs, kā tikt pie nejauša bojājuma vērtības
     }
-    public abstract void ApplyEffect(Character target);
+
+    public abstract void ApplyEffect(Character target); // Abstrakta metode, kas jārealizē katram ieročam
 }

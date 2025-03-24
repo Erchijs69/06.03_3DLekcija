@@ -5,30 +5,35 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     public int health;
-    
-    [SerializeField] private Weapon weapon;
-
-    public Weapon Weapon
-    {
-        get { return weapon; }
-    }
+    public string characterName;
+    public Weapon weapon;
 
     public virtual int Attack()
     {
-        return weapon.GetDamage();
+        return 10; // Default attack damage
     }
 
-    public void GetHit(int damage)
+    // Make GetHit virtual so it can be overridden in subclasses
+    public virtual void GetHit(int damage)
     {
-        Debug.Log(name + " starting health: " + health);
         health -= damage;
-        Debug.Log("health after hit: " + health);
+        Debug.Log(characterName + " took " + damage + " damage. Health: " + health);
+        
+        if (health <= 0) 
+        {
+            Die();
+        }
     }
 
-    public void GetHit(Weapon weapon)
+    public virtual void Die()
     {
-        Debug.Log(name + " starting health: " + health);
-        health -= weapon.GetDamage();
-        Debug.Log("health after hit by "+ weapon.name + ": " + health);
+        Debug.Log(characterName + " is dead.");
+    }
+
+    public void SetWeapon(Weapon newWeapon)
+    {
+        weapon = newWeapon;
     }
 }
+
+

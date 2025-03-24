@@ -4,10 +4,55 @@ using UnityEngine;
 
 public class Player : Character
 {
-    [SerializeField] private string charName;
+    public string charName;
+    private bool isShieldActive = false;
+    private int shieldDurability = 5;
 
-    public string CharName
+    public override int Attack()
     {
-        get { return charName; }
+        return weapon.GetDamage();
+    }
+
+    public void ActivateShield()
+    {
+        if (shieldDurability > 0)
+        {
+            isShieldActive = true;
+            Debug.Log(charName + " shield activated!");
+        }
+        else
+        {
+            Debug.Log("No shield durability left.");
+        }
+    }
+
+    public void DeactivateShield()
+    {
+        isShieldActive = false;
+        Debug.Log(charName + " shield deactivated!");
+    }
+
+    // Override GetHit to account for shield blocking
+    public override void GetHit(int damage)
+    {
+        if (isShieldActive)
+        {
+            int reducedDamage = Mathf.Max(0, damage - 2);  // Reduce damage if shield is active
+            shieldDurability -= 1;  // Reduce shield durability
+            Debug.Log(charName + " blocked damage with shield. Reduced damage: " + reducedDamage + ". Shield durability: " + shieldDurability);
+            base.GetHit(reducedDamage);  // Call the base GetHit with reduced damage
+        }
+        else
+        {
+            base.GetHit(damage);  // If no shield, take full damage
+        }
+
+        if (shieldDurability <= 0)
+        {
+            DeactivateShield();  // If shield is broken, deactivate it
+        }
     }
 }
+
+
+
