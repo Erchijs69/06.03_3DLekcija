@@ -4,25 +4,20 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    public int health;
+    public int health = 100;
     public string characterName;
     public Weapon weapon;
 
     public virtual int Attack()
     {
-        return 10; // Default attack damage
+        return 10; // Default attack value
     }
 
-    // Make GetHit virtual so it can be overridden in subclasses
+    // Make GetHit virtual to allow overriding in derived classes
     public virtual void GetHit(int damage)
     {
         health -= damage;
-        Debug.Log(characterName + " took " + damage + " damage. Health: " + health);
-        
-        if (health <= 0) 
-        {
-            Die();
-        }
+        if (health <= 0) Die();
     }
 
     public virtual void Die()
@@ -35,5 +30,7 @@ public class Character : MonoBehaviour
         weapon = newWeapon;
     }
 }
+
+
 
 

@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Berserker : Character
+public class Berserker : Enemy
 {
     public override int Attack()
     {
-        return 20; 
+        return 20; // Berserker has a stronger attack
     }
 
     public override void Die()
     {
         base.Die();
-        GameManager.Instance.CreateNewEnemy();
+        // After dying, the next enemy will be spawned by GameManager
     }
 }
+

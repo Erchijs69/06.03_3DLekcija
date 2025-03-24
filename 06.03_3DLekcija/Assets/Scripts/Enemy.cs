@@ -6,14 +6,20 @@ public class Enemy : Character
 {
     public override int Attack()
     {
-        return 12; // Default enemy attack damage
+        return 12; // Default enemy attack value, can be overridden by specific enemies
     }
 
-    // Override Die to call CreateNewEnemy
+    // Override GetHit to handle custom enemy behavior if needed
+    public override void GetHit(int damage)
+    {
+        base.GetHit(damage);
+    }
+
     public override void Die()
     {
         base.Die();
-        GameManager.Instance.CreateNewEnemy();  // Create new enemy when this one dies
+        // Additional behavior when enemy dies (like spawning next enemy)
     }
 }
+
 

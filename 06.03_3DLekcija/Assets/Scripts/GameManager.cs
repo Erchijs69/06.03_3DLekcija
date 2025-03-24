@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public Player player;
-    public Character enemy;
+    public Character currentEnemy;
 
     public TMP_Text playerName;
     public TMP_Text playerHealth;
@@ -18,6 +18,16 @@ public class GameManager : MonoBehaviour
     public GameObject attackButton;
     public GameObject shieldButton;
 
+    public GameObject berserker;  // Reference to the Berserker GameObject
+    public GameObject mage;       // Reference to the Mage GameObject
+    public GameObject archer;     // Reference to the Archer GameObject
+
+    public Image berserkerImage;  // UI Image for Berserker
+    public Image mageImage;       // UI Image for Mage
+    public Image archerImage;     // UI Image for Archer
+
+    private int enemyIndex = 0;   // To keep track of which enemy is next
+
     void Awake()
     {
         Instance = this;
@@ -27,25 +37,26 @@ public class GameManager : MonoBehaviour
     {
         playerName.text = player.charName;
         playerHealth.text = "Health: " + player.health.ToString();
-        enemyName.text = enemy.characterName;
-        enemyHealth.text = "Health: " + enemy.health.ToString();
         statusText.text = "Battle Start!";
+        SpawnNextEnemy();
     }
 
     public void Attack()
     {
         statusText.text = "You attacked!";
-        enemy.GetHit(player.Attack());
+        currentEnemy.GetHit(player.Attack());
         UpdateUI();
-        if (enemy.health <= 0)
+
+        if (currentEnemy.health <= 0)
         {
-            statusText.text = "You Win!";
-            CreateNewEnemy();
+            statusText.text = "Enemy defeated!";
+            SpawnNextEnemy();  // Spawn the next enemy after the current one is defeated
         }
         else
         {
-            int enemyDamage = enemy.Attack();
-            player.GetHit(enemyDamage);  // Enemy attacks player
+            // After the player's attack, let the enemy attack the player
+            statusText.text = currentEnemy.characterName + " attacks!";
+            player.GetHit(currentEnemy.Attack());  // Enemy attacks player
             UpdateUI();
         }
     }
@@ -53,47 +64,75 @@ public class GameManager : MonoBehaviour
     public void Defend()
     {
         statusText.text = "You are defending!";
-        player.ActivateShield();  // Activate shield
+        player.ActivateShield();
     }
 
     public void EndDefend()
     {
         statusText.text = "You stopped defending!";
-        player.DeactivateShield();  // Deactivate shield
+        player.DeactivateShield();
     }
 
     public void UpdateUI()
     {
         playerHealth.text = "Health: " + player.health.ToString();
-        enemyHealth.text = "Health: " + enemy.health.ToString();
+        enemyHealth.text = "Health: " + currentEnemy.health.ToString();
     }
 
-    public void CreateNewEnemy()
+    public void SpawnNextEnemy()
     {
-        Debug.Log("A new enemy appears!");
-        int enemyType = Random.Range(0, 3);
-        switch (enemyType)
+        // Disable all enemy GameObjects
+        berserker.SetActive(false);
+        mage.SetActive(false);
+        archer.SetActive(false);
+
+        // Disable all enemy images
+        berserkerImage.gameObject.SetActive(false);
+        mageImage.gameObject.SetActive(false);
+        archerImage.gameObject.SetActive(false);
+
+        // Check if all enemies are defeated
+        if (enemyIndex == 3)  // We have defeated all 3 enemies
         {
-            case 0:
-                enemy = new Berserker();
-                break;
-            case 1:
-                enemy = new Mage();
-                break;
-            case 2:
-                enemy = new Archer();
-                break;
+            EndGame();
+            return;
         }
-        enemyName.text = enemy.characterName;
-        enemyHealth.text = "Health: " + enemy.health.ToString();
+
+        // Based on enemyIndex, activate the next enemy and its image
+        if (enemyIndex == 0)
+        {
+            berserker.SetActive(true);
+            currentEnemy = berserker.GetComponent<Berserker>();
+            berserkerImage.gameObject.SetActive(true);
+        }
+        else if (enemyIndex == 1)
+        {
+            mage.SetActive(true);
+            currentEnemy = mage.GetComponent<Mage>();
+            mageImage.gameObject.SetActive(true);
+        }
+        else if (enemyIndex == 2)
+        {
+            archer.SetActive(true);
+            currentEnemy = archer.GetComponent<Archer>();
+            archerImage.gameObject.SetActive(true);
+        }
+
+        // Update UI with new enemy's stats
+        enemyName.text = currentEnemy.characterName;
+        enemyHealth.text = "Health: " + currentEnemy.health.ToString();
+
+        enemyIndex++;  // Increment enemyIndex after setting everything
     }
 
     public void EndGame()
     {
-        statusText.text = "Game Over!";
+        statusText.text = "You Win!";
         attackButton.SetActive(false);
         shieldButton.SetActive(false);
     }
 }
+
+
 
 

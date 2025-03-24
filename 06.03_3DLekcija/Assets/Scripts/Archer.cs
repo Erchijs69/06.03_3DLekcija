@@ -2,17 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Archer : Character
+public class Archer : Enemy
 {
     public override int Attack()
     {
-        return 12; // Bultu uzbrukums
+        return 12; // Archer has a bow attack
     }
 
     public override void Die()
     {
         base.Die();
-        // Izveidot jaunu pretinieku
-        GameManager.Instance.CreateNewEnemy();
+        // After dying, the next enemy will be spawned by GameManager
     }
 }
+
