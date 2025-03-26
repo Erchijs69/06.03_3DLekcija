@@ -6,14 +6,15 @@ public class Mage : Enemy
 {
     public override int Attack()
     {
-        return 15; // Mage has a magical attack
+        return weapon.GetDamage();
     }
 
     public override void Die()
     {
         base.Die();
-        // After dying, the next enemy will be spawned by GameManager
     }
+
+    
 }
 
 

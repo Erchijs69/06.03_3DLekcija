@@ -9,8 +9,8 @@ public abstract class Weapon : MonoBehaviour
 
     public int GetDamage()
     {
-        return Random.Range(minDamage, maxDamage); // Piemērs, kā tikt pie nejauša bojājuma vērtības
+        return Random.Range(minDamage, maxDamage); // RandomDamage
     }
 
-    public abstract void ApplyEffect(Character target); // Abstrakta metode, kas jārealizē katram ieročam
+    public abstract void ApplyEffect(Character target); 
 }

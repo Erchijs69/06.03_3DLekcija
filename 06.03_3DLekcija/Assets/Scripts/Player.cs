@@ -7,6 +7,10 @@ public class Player : Character
     public string charName;
     private bool isShieldActive = false;  
     private int shieldDurability = 5;  
+    private bool isShieldBroken = false;  
+
+    public int ShieldDurability => shieldDurability;  
+    public bool IsShieldBroken => isShieldBroken;  
 
     public override int Attack()
     {
@@ -15,44 +19,44 @@ public class Player : Character
 
     public void ActivateShield()
     {
-        if (shieldDurability > 0)
+        if (shieldDurability > 0 && !isShieldBroken) 
         {
             isShieldActive = true;
-            Debug.Log(charName + " shield activated!");
-        }
-        else
-        {
-            Debug.Log("No shield durability left.");
         }
     }
 
     public void DeactivateShield()
     {
         isShieldActive = false;
-        Debug.Log(charName + " shield deactivated!");
     }
 
-    // Override GetHit to handle shield logic
     public override void GetHit(int damage)
     {
         if (isShieldActive)
         {
-            int reducedDamage = Mathf.Max(0, damage - 2);  // Reduces damage if shield is active
-            shieldDurability -= 1;  // Decreases shield durability
-            Debug.Log(charName + " blocked damage with shield. Reduced damage: " + reducedDamage + ". Shield durability: " + shieldDurability);
-            base.GetHit(reducedDamage); // Call base class GetHit with reduced damage
+            
+            int maxEnemyDamage = GameManager.Instance.currentEnemy.Attack();  
+
+            
+            int damageReduction = Random.Range(2, maxEnemyDamage + 1); 
+            int reducedDamage = Mathf.Max(0, damage - damageReduction);  
+
+            shieldDurability -= 1; 
+            GameManager.Instance.statusText.text = "Damage reduced by: " + damageReduction.ToString();  
+            
+            base.GetHit(reducedDamage); 
         }
         else
         {
-            base.GetHit(damage);  // No shield, take full damage
+            base.GetHit(damage);  
         }
 
-        if (shieldDurability <= 0)
+        if (shieldDurability <= 0 && !isShieldBroken)
         {
-            DeactivateShield();  // Deactivate shield when durability is exhausted
+            DeactivateShield();  
+            isShieldBroken = true;  
+            GameManager.Instance.UpdateUI();  
         }
     }
 }
-
-
 

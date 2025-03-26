@@ -1,32 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; 
+using TMPro;
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public Player player;
     public Character currentEnemy;
 
+//TEXT
     public TMP_Text playerName;
     public TMP_Text playerHealth;
     public TMP_Text enemyName;
     public TMP_Text enemyHealth;
     public TMP_Text statusText;
-
+//UI BUTTONS
     public GameObject attackButton;
     public GameObject shieldButton;
+    public GameObject restartButton;
+//ENEMIES
+    public GameObject berserker;
+    public GameObject mage;
+    public GameObject archer;
+//IMAGES
+    public Image berserkerImage;
+    public Image mageImage;
+    public Image archerImage;
 
-    public GameObject berserker;  // Reference to the Berserker GameObject
-    public GameObject mage;       // Reference to the Mage GameObject
-    public GameObject archer;     // Reference to the Archer GameObject
+//AUDIO
+    public AudioSource audioSource;
+    public AudioClip attackSound;
+    public AudioClip defendSound;
+    public AudioClip buttonClickSound;
+    public AudioClip shieldBreakSound;  
 
-    public Image berserkerImage;  // UI Image for Berserker
-    public Image mageImage;       // UI Image for Mage
-    public Image archerImage;     // UI Image for Archer
-
-    private int enemyIndex = 0;   // To keep track of which enemy is next
+    private int enemyIndex = 0;
+    private bool hasPlayedShieldBreakSound = false;  
 
     void Awake()
     {
@@ -38,67 +50,102 @@ public class GameManager : MonoBehaviour
         playerName.text = player.charName;
         playerHealth.text = "Health: " + player.health.ToString();
         statusText.text = "Battle Start!";
+        restartButton.SetActive(false);
         SpawnNextEnemy();
+    }
+
+    public void PlaySound(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 
     public void Attack()
     {
+        PlaySound(attackSound);
+        int playerDamage = player.Attack();
         statusText.text = "You attacked!";
-        currentEnemy.GetHit(player.Attack());
+        Debug.Log($"Player attacks {currentEnemy.characterName} for {playerDamage} damage.");
+        
+        currentEnemy.GetHit(playerDamage);
         UpdateUI();
 
         if (currentEnemy.health <= 0)
         {
+            Debug.Log($"{currentEnemy.characterName} defeated!");
             statusText.text = "Enemy defeated!";
-            SpawnNextEnemy();  // Spawn the next enemy after the current one is defeated
+            SpawnNextEnemy();
         }
         else
         {
-            // After the player's attack, let the enemy attack the player
-            statusText.text = currentEnemy.characterName + " attacks!";
-            player.GetHit(currentEnemy.Attack());  // Enemy attacks player
-            UpdateUI();
+            EnemyTurn();
+        }
+    }
+
+    public void EnemyTurn()
+    {
+        int enemyDamage = currentEnemy.Attack();
+        statusText.text = currentEnemy.characterName + " attacks!";
+        Debug.Log($"{currentEnemy.characterName} attacks Player for {enemyDamage} damage.");
+        
+        player.GetHit(enemyDamage);
+        UpdateUI();
+
+        if (player.health <= 0)
+        {
+            EndGame(false);
         }
     }
 
     public void Defend()
     {
+        PlaySound(defendSound);
         statusText.text = "You are defending!";
+        Debug.Log("Player is defending.");
         player.ActivateShield();
     }
 
     public void EndDefend()
     {
         statusText.text = "You stopped defending!";
+        Debug.Log("Player stopped defending.");
         player.DeactivateShield();
     }
 
+   
     public void UpdateUI()
     {
-        playerHealth.text = "Health: " + player.health.ToString();
-        enemyHealth.text = "Health: " + currentEnemy.health.ToString();
+        playerHealth.text = "Health: " + Mathf.Max(0, player.health).ToString();
+        enemyHealth.text = "Health: " + Mathf.Max(0, currentEnemy.health).ToString();
+
+        // Broken Sjield
+        if (player.ShieldDurability <= 0 && player.IsShieldBroken && !hasPlayedShieldBreakSound)
+        {
+            shieldButton.SetActive(false);  // Disable shield button
+            statusText.text = "Shield broken!";  // Update status text
+            PlaySound(shieldBreakSound);  // Play shield break sound once
+            hasPlayedShieldBreakSound = true;  // Mark the sound as played
+        }
     }
 
     public void SpawnNextEnemy()
     {
-        // Disable all enemy GameObjects
         berserker.SetActive(false);
         mage.SetActive(false);
         archer.SetActive(false);
 
-        // Disable all enemy images
         berserkerImage.gameObject.SetActive(false);
         mageImage.gameObject.SetActive(false);
         archerImage.gameObject.SetActive(false);
 
-        // Check if all enemies are defeated
-        if (enemyIndex == 3)  // We have defeated all 3 enemies
+        if (enemyIndex == 3)
         {
-            EndGame();
+            EndGame(true);
             return;
         }
 
-        // Based on enemyIndex, activate the next enemy and its image
         if (enemyIndex == 0)
         {
             berserker.SetActive(true);
@@ -118,21 +165,37 @@ public class GameManager : MonoBehaviour
             archerImage.gameObject.SetActive(true);
         }
 
-        // Update UI with new enemy's stats
+        Debug.Log($"New enemy spawned: {currentEnemy.characterName} with {currentEnemy.health} HP.");
         enemyName.text = currentEnemy.characterName;
         enemyHealth.text = "Health: " + currentEnemy.health.ToString();
 
-        enemyIndex++;  // Increment enemyIndex after setting everything
+        enemyIndex++;
     }
 
-    public void EndGame()
+    public void EndGame(bool playerWon)
     {
-        statusText.text = "You Win!";
+        if (playerWon)
+        {
+            statusText.text = "You Win!";
+            Debug.Log("Player won the battle!");
+        }
+        else
+        {
+            statusText.text = "You Lose!";
+            Debug.Log("Player lost the battle!");
+        }
+
         attackButton.SetActive(false);
         shieldButton.SetActive(false);
+        restartButton.SetActive(true);
+    }
+
+    public void RestartGame()
+    {
+        PlaySound(buttonClickSound);
+        Debug.Log("Restarting game...");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
-
-
 
 

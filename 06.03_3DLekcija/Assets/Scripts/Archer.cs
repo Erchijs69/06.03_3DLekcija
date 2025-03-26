@@ -6,13 +6,14 @@ public class Archer : Enemy
 {
     public override int Attack()
     {
-        return 12; // Archer has a bow attack
+        return weapon.GetDamage();
     }
 
     public override void Die()
     {
         base.Die();
-        // After dying, the next enemy will be spawned by GameManager
     }
+
+    
 }
 

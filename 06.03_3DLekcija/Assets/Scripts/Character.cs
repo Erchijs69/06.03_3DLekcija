@@ -10,10 +10,10 @@ public class Character : MonoBehaviour
 
     public virtual int Attack()
     {
-        return 10; // Default attack value
+        return 10; 
     }
 
-    // Make GetHit virtual to allow overriding in derived classes
+    
     public virtual void GetHit(int damage)
     {
         health -= damage;
