@@ -7,5 +7,5 @@ Spēli ir iespējams uzvarēt un zaudēt, abos gadījumos spēli var restartēt 
 OPP
 1. Mantošana- tika izmantota Player un Enemy mantojot Character klasi
 2. Enkapsulācija - izmantoju "shieldDurability" Player klasē 
-3. Polimorfisms- Attack metodfi izmantoju plaer, berserker, mage un archer klasēs
+3. Polimorfisms- Attack metodi izmantoju player, berserker, mage un archer klasēs
 4. Abstrakcija- veidojot Weapon klasi
